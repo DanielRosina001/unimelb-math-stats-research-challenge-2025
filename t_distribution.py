@@ -6,18 +6,18 @@ def T_matrix(n):
     s = 2*n+1
     matrix = np.zeros((s, s), dtype=object)
     for i in range(1, s - 1):
-        matrix[i-1, i] = 1   # sub-diagonal
-        matrix[i+1, i] = 1   # super-diagonal
+        matrix[i-1, i] = 1/2   # sub-diagonal
+        matrix[i+1, i] = 1/2   # super-diagonal
     return matrix
 
 # Creates initial state vector
-def c0(n):
-    c0_list = []
+def P0(n):
+    P0_list = []
     for k in range(n+1):
-        c0_list.append(int(math.comb(n, k)))
+        P0_list.append(float(math.comb(n, k) / (2**n))) 
         if k != n:  
-            c0_list.append(0)
-    return np.array(c0_list, dtype=object).reshape(-1, 1)
+            P0_list.append(0)
+    return np.array(P0_list, dtype=object).reshape(-1, 1)
 
 # Creates extraction vector
 def e(n): 
@@ -26,8 +26,8 @@ def e(n):
     e[-1] = 1
     return np.array(e, dtype=object).reshape(-1, 1)
 
-# Computes the number of valid paths at step k
-def paths(n, k): 
+# Computes the probability of meeting at step k
+def Pr(n, k): 
     if k < n or (k-n) % 2 != 0: # Impossible starting conditions
         return 0
     
@@ -35,16 +35,12 @@ def paths(n, k):
     T = T_matrix(n)
 
     # Create initial state vector
-    C = c0(n)
+    P = P0(n)
 
     # Create extraction vector
     E = e(n)
 
-    return ((np.linalg.matrix_power(T, k-n) @ C).T @ E)[0,0] # Computing the number of valid paths using (T^(k-n) * c0) · e
-
-# Computes the probability of meeting at step k
-def Pr(n, k): 
-    return 2**(-k) * paths(n, k) # Implements equation (2)
+    return ((np.linalg.matrix_power(T, k-n) @ P).T @ E)[0,0] # Computing the probabilities of valid paths using (T^(k-n) * P0) · e
 
 # Computes T-distribution for specific n, up to step k=200
 def t_distribution(n, length=200):
