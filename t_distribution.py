@@ -12,11 +12,8 @@ def T_matrix(n):
 
 # Creates initial state vector
 def P0(n):
-    P0_list = []
-    for k in range(n+1):
-        P0_list.append(float(math.comb(n, k) / (2**n))) 
-        if k != n:  
-            P0_list.append(0)
+    P0_list = [0.0 for _ in range(2*n+1)]
+    P0_list[n] = 1.0
     return np.array(P0_list, dtype=object).reshape(-1, 1)
 
 # Creates extraction vector
@@ -40,7 +37,7 @@ def Pr(n, k):
     # Create extraction vector
     E = e(n)
 
-    return ((np.linalg.matrix_power(T, k-n) @ P).T @ E)[0,0] # Computing the probabilities of valid paths using (T^(k-n) * P0) · e
+    return ((np.linalg.matrix_power(T, k) @ P).T @ E)[0,0] # Computing the probabilities of valid paths using (T^(k-n) * P0) · e
 
 # Computes T-distribution for specific n, up to step k=200
 def t_distribution(n, length=200):
